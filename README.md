@@ -117,6 +117,104 @@
 
    lastly, update the blocknumber
   
+  #### - updatestakingpool function
+
+    function updateStakingPool() internal {
+    	uint256 length = poolInfo.length;
+            uint256 points = 0;
+            for (uint256 pid = 1; pid < length; ++pid) {
+                points = points.add(poolInfo[pid].allocPoint);
+            }
+            if (points != 0) {
+                points = points.div(3);
+                totalAllocPoint = totalAllocPoint.sub(poolInfo[0].allocPoint).add(points);
+                poolInfo[0].allocPoint = points;
+            }
+      }
+    
+
+   call this function at the end of adding LP token pool to update the alloc for cake and totalalloc point
+
+   
+    	uint256 length = poolInfo.length;
+   
+
+   length ≥2 when it's called because we just pushed the LP to the [pool.info](http://pool.info) array
+
+  
+    for (uint256 pid = 1; pid < length; ++pid) {
+                points = points.add(poolInfo[pid].allocPoint);
+            }
+
+   points = all pools' allocpoints combined except for **cake** **pool** (alloc point was set by the pool adder) in add func's parameter
+
+    
+    if (points != 0) {
+                points = points.div(3);
+                totalAllocPoint = totalAllocPoint.sub(poolInfo[0].allocPoint).add(points);
+                poolInfo[0].allocPoint = points;
+            }
+    ```
+
+   points is divided by 3 and then set to the pool[0] allocPoint in order to set the **cake pool's allocPoint to** **always be 25% relatively to other pools' alloc**
+
+   for example before add new LP, totalalloc = cake.alloc = 100
+
+   after add new LP with 100 alloc, totalalloc = 100+100=200, points = 100 , new points(divided by 3) = 33, new totalalloc = totalalloc - cake.alloc + newpoints = 200-100+33=133, cake.allocpoint = new points (divided by 3) = 33 
+
+   So cake's alloc/totalalloc = 33/133 = 25%
+   
+  #### - pendingcake
+
+    
+    function pendingCake(uint256 _pid, address _user) external view returns (uint256) {
+            PoolInfo storage pool = poolInfo[_pid];
+            UserInfo storage user = userInfo[_pid][_user];
+            uint256 accCakePerShare = pool.accCakePerShare;
+            uint256 lpSupply = pool.lpToken.balanceOf(address(this));
+            if (block.number > pool.lastRewardBlock && lpSupply != 0) //current block must be > lastrewardblock to get the positive multiplier {
+                uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number); //10x 20x , so on on the website. 100=1x
+                uint256 cakeReward = multiplier.mul(cakePerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+    						//cakereward is the total cake that that pool will get from the total cake minted for all pools
+                accCakePerShare = accCakePerShare.add(cakeReward.mul(1e12).div(lpSupply));
+    						//accCakePerShare is the multiplier of how many cake user will get calculated proportionately to the LPsupply for example, user has 1 LP, they will get 1* accCakePerShare cake tokens
+            }
+            return user.amount.mul(accCakePerShare).div(1e12).sub(user.rewardDebt)
+    								//if 1st stake 100, 2nd stake 100> system will transfer cake due to the 1st 100 stake. then user will have 200 of user.amount so his pending will be user.amount-rewarddebt = 200-100 =100
+    								//rewarddebt = amount that has been transfered to user before to reset their reward when they enter the new staking
+    }
+    
+    
+    PoolInfo storage pool = poolInfo[_pid];
+    UserInfo storage user = userInfo[_pid][_user];
+    
+   to get the pool info and user info specific to that _pid
+
+    
+    uint256 accCakePerShare = pool.accCakePerShare;
+
+   to get the pool.accCakePerShare (not the lastest one according to the block.number that has changed.
+
+
+    uint256 lpSupply = pool.lpToken.balanceOf(address(this));
+
+   get the LP tokens balances in Masterchef contract
+
+
+    if (block.number > pool.lastRewardBlock && lpSupply != 0) //current block must be > lastrewardblock to get the positive multiplier 
+
+   to check if block.number > pool.lastRewardBlock because we need getMultiplier to be more than 1 or knows that the block already runs from the lastRewardBlock
+
+    
+    uint256 cakeReward = multiplier.mul(cakePerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+
+   get cake reward for that pool proportionately
+
+
+    accCakePerShare = accCakePerShare.add(cakeReward.mul(1e12).div(lpSupply));
+
+   update the accCakePerShare according to the change of cakeReward/lpSupply (newly added accCakePerShare)
+   
 ## Deployed Contracts / Hash
 
 ### BKC testnet
