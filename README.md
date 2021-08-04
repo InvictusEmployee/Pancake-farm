@@ -1,17 +1,55 @@
-# PanCake Farming 🥞
+# This is the forked project of PanCake Farming 🍴
 
-[![Actions Status](https://github.com/pancakeswap/pancake-farm/workflows/CI/badge.svg)](https://github.com/pancakeswap/pancake-farm/actions)
-[![codecov](https://codecov.io/gh/pancakeswap/pancake-farm/branch/master/graph/badge.svg?token=5XMLP74IR0)](https://codecov.io/gh/pancakeswap/pancake-farm)
+## modification
 
-https://pancakeswap.finance. Feel free to read the code. More details coming soon.
+  take the syrup token (cake's syrup token that represent the cake holding when users are staking) minting out of the enterStaking and leaveStaking function because the syrup token was deprecated due to the announcement that it has a vulnerability that users can manage to mint unlimited syrup sullply somehow.
+  
+  add the explaination and calculation formula in order to make it easier to fork and modify as our wish.
+  
+## code and function explaination
+
+  #### add function
+
+    function add(uint256 _allocPoint, IBEP20 _lpToken, bool _withUpdate) public onlyOwner {
+            if (_withUpdate) {
+                massUpdatePools();
+            }
+            uint256 lastRewardBlock = block.number > startBlock ? block.number : startBlock; //to change the lastRewardBlock of other LP to = startblock
+            totalAllocPoint = totalAllocPoint.add(_allocPoint); 
+            poolInfo.push(PoolInfo({
+                lpToken: _lpToken,
+                allocPoint: _allocPoint,
+                lastRewardBlock: lastRewardBlock,
+                accCakePerShare: 0
+            }));
+            updateStakingPool();
+        }
+    
+    
+    _allocpoint will assign the allocationpoint of that LP token
+
+    _lpToken is the address of pancake pair
+
+    massUpdatePools will call the updatepool() of every pools including cake pool
+
+    lastRewardBlock = block number that the reward has been calculated.
+
+    lastRewardBlock of _lpToken will be changed to = startBlock in order start getting cake reward at the startBlock too.
+
+    totalAllocPoint += _allocPoint 
+
+    poolInfo array will be updated with the 
+
+    {           lpToken: _lpToken,
+                allocPoint: _allocPoint,
+                lastRewardBlock: lastRewardBlock,
+                accCakePerShare: 0}
 
 ## Deployed Contracts / Hash
 
-### BSCMAINNET
+### BKC testnet
 
-- CakeToken - https://bscscan.com/token/0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82
-- MasterChef - https://bscscan.com/address/0x73feaa1eE314F8c655E354234017bE2193C9E24E
-- (Uni|Cake)swapV2Factory - https://bscscan.com/address/0xBCfCcbde45cE874adCB698cC183deBcF17952812
-- (Uni|Cake)swapV2Router02 - https://bscscan.com/address/0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F
-- (Uni|Cake)swapV2Pair init code hash - `0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66`
-- MultiCall - 0xE1dDc30f691CA671518090931e3bFC1184BFa4Aa
+- CakeToken 0xC80412c23fF0B5dD9f61c054f72280C16570AcA7
+- MasterChef - 0x083A7a096087b0A75473D1Fe2ba9f91250f09eA0
+- SyrupBar - 0x77DB5E829d71Eab4C82E4Ad4D32FB97142F7C581
+
