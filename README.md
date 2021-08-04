@@ -65,63 +65,57 @@
             //when update pool accCakePerShare will += cakeReward.mul(1e12).div(lpSupply) on and on.
             pool.lastRewardBlock = block.number; // update the block number.
         }
-    ```
+  
 
-    uint256 _pid is number of pool which is 0(cake pool), 1, 2, 3, ... for other LP token pools
+   uint256 _pid is number of pool which is 0(cake pool), 1, 2, 3, ... for other LP token pools
 
-    ```jsx
+    
     if (block.number <= pool.lastRewardBlock) {
                 return 
-    ```
+   
 
-    when the current block isn't more than lastrewardblock that was set in the constructor, do nothing
+   when the current block isn't more than lastrewardblock that was set in the constructor, do nothing
 
-    ```jsx
+    
     uint256 lpSupply = pool.lpToken.balanceOf(address(this));
-    ```
+    
+   get the supply of LPtoken in masterchef address
 
-    get the supply of LPtoken in masterchef address
-
-    ```jsx
+    
     if (lpSupply == 0) {
                 pool.lastRewardBlock = block.number; 
                 return; //when not adding lp here it will set pool.lastRewardBlock = block.number; 
             }
-    ```
+    
+   when add the LP pool first time by admin, lpSupply will be 0 which will only change the pool.lastRewardBlock (the latest block that reward was calculated) to be the current block number
 
-    when add the LP pool first time by admin, lpSupply will be 0 which will only change the pool.lastRewardBlock (the latest block that reward was calculated) to be the current block number
-
-    ```jsx
+    
     uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
-    ```
+    
+   getMultiplier(pool.lastRewardBlock, block.number) will get the amount of bonus*(block between block.number and pool.lastRewardBlock) ; bonus = 1 (admin set it)
 
-    getMultiplier(pool.lastRewardBlock, block.number) will get the amount of bonus*(block between block.number and pool.lastRewardBlock) ; bonus = 1 (admin set it)
-
-    ```jsx
+    
      uint256 cakeReward = multiplier.mul(cakePerBlock).mul(pool.allocPoint).div(totalAllocPoint);
-    ```
 
-    cakeReward is the amount of multiplier(block distance*bonus) times cakeperblock times the proportion of that pool allocation point comparing to the total  allocation point of all pools
+   cakeReward is the amount of multiplier(block distance*bonus) times cakeperblock times the proportion of that pool allocation point comparing to the total  allocation point of all pools
 
-    ```jsx
+    
     cake.mint(devaddr, cakeReward.div(10))
     cake.mint(address(syrup), cakeReward);
-    ```
+    
+   mint cake using cake contract to developer address with the cakeReward.div(10) CAKE
 
-    mint cake using cake contract to developer address with the cakeReward.div(10) CAKE
+   mint cake to syrup address in order to distribute to the users later.
 
-    mint cake to syrup address in order to distribute to the users later.
-
-    ```jsx
+    
     pool.accCakePerShare = pool.accCakePerShare.add(cakeReward.mul(1e12).div(lpSupply)); 
     //when update pool accCakePerShare will += cakeReward.mul(1e12).div(lpSupply) on and on.
     pool.lastRewardBlock = block.number; // update the block number.
         }
-    ```
 
-    accCakePerShare = amount of cake user will get per one share LP token. Multiply by 10^12 in order to avoid the decimal in Solidity
+   accCakePerShare = amount of cake user will get per one share LP token. Multiply by 10^12 in order to avoid the decimal in Solidity
 
-    lastly, update the blocknumber
+   lastly, update the blocknumber
   
 ## Deployed Contracts / Hash
 
