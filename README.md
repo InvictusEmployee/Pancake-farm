@@ -183,8 +183,8 @@
     								//if 1st stake 100, 2nd stake 100> system will transfer cake due to the 1st 100 stake. then user will have 200 of user.amount so his pending will be user.amount-rewarddebt = 200-100 =100
     								//rewarddebt = amount that has been transfered to user before to reset their reward when they enter the new staking
     }
-    
-    
+   - 
+   
     PoolInfo storage pool = poolInfo[_pid];
     UserInfo storage user = userInfo[_pid][_user];
     
