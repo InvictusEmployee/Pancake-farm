@@ -26,25 +26,27 @@
         }
     
     
-    _allocpoint will assign the allocationpoint of that LP token
+  - _allocpoint will assign the allocationpoint of that LP token
 
-    _lpToken is the address of pancake pair
+  - _lpToken is the address of pancake pair
 
-    massUpdatePools will call the updatepool() of every pools including cake pool
+  - massUpdatePools will call the updatepool() of every pools including cake pool
 
-    lastRewardBlock = block number that the reward has been calculated.
+  - lastRewardBlock = block number that the reward has been calculated.
 
-    lastRewardBlock of _lpToken will be changed to = startBlock in order start getting cake reward at the startBlock too.
+  - lastRewardBlock of _lpToken will be changed to = startBlock in order start getting cake reward at the startBlock too.
 
-    totalAllocPoint += _allocPoint 
+  - totalAllocPoint += _allocPoint 
 
-    poolInfo array will be updated with the 
+  - poolInfo array will be updated with the 
 
-    {           lpToken: _lpToken,
-                allocPoint: _allocPoint,
-                lastRewardBlock: lastRewardBlock,
-                accCakePerShare: 0}
+  {           lpToken: _lpToken,
+              allocPoint: _allocPoint,
+              lastRewardBlock: lastRewardBlock,
+              accCakePerShare: 0}
 
+
+  
 ## Deployed Contracts / Hash
 
 ### BKC testnet
